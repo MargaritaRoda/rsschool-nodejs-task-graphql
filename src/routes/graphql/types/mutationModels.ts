@@ -55,9 +55,3 @@ export const updateUser = new GraphQLInputObjectType({
     })
 })
 
-// export const createUserSubscribeTo = new GraphQLInputObjectType({
-//     name: 'createUserSubscribeToInput',
-//     fields: () => ({
-//         authorId: { type: UUIDType },
-//     })
-// })

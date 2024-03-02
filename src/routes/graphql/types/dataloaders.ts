@@ -45,18 +45,18 @@ export const Posts = new GraphQLObjectType({
         author: {
             type: Users,
             resolve: async (source: Post, _, {prisma, dataloaders}: FastifyInstance, info) => {
-                let newDataLoader = dataloaders.get(info.fieldNodes);
-                if (!newDataLoader) {
-                    newDataLoader = new DataLoader(async (manyId: readonly string[]) => {
+                let dl = dataloaders.get(info.fieldNodes);
+                if (!dl) {
+                    dl = new DataLoader(async (manyId: readonly string[]) => {
                         const result = await prisma.user.findMany({
                             where: {id: {in: manyId as string[]}},
                         })
 
                         return manyId.map((id: string) => result.find(post => post.id === id));
                     });
-                    dataloaders.set(info.fieldNodes, newDataLoader);
+                    dataloaders.set(info.fieldNodes, dl);
                 }
-                return newDataLoader.load(source.id);
+                return dl.load(source.id);
             },
         },
     }),
@@ -85,19 +85,19 @@ export const Profiles = new GraphQLObjectType({
         memberType: {
             type: MemberType,
             resolve: async (source: Profile, _, {prisma, dataloaders}: FastifyInstance, info) => {
-                let newDataLoader = dataloaders.get(info.fieldNodes);
+                let dl = dataloaders.get(info.fieldNodes);
 
-                if (!newDataLoader) {
-                    newDataLoader = new DataLoader(async (manyId: readonly string[]) => {
+                if (!dl) {
+                    dl = new DataLoader(async (manyId: readonly string[]) => {
                         const result = await prisma.memberType.findMany({
                             where: {id: {in: manyId as string[]}},
                         })
 
                         return manyId.map((id: string) => result.find(post => post.id === id));
                     });
-                    dataloaders.set(info.fieldNodes, newDataLoader);
+                    dataloaders.set(info.fieldNodes, dl);
                 }
-                return newDataLoader.load(source.memberTypeId);
+                return dl.load(source.memberTypeId);
             },
         },
     })
@@ -135,19 +135,19 @@ export const Users: GraphQLObjectType = new GraphQLObjectType({
             resolve: async (source: User, _, context: FastifyInstance, info) => {
                 const {dataloaders, prisma} = context;
 
-                let newDataLoader = dataloaders.get(info.fieldNodes);
+                let dl = dataloaders.get(info.fieldNodes);
 
-                if (!newDataLoader) {
-                    newDataLoader = new DataLoader(async (manyId: readonly string[]) => {
+                if (!dl) {
+                    dl = new DataLoader(async (manyId: readonly string[]) => {
                         const result = await prisma.post.findMany({
                             where: {authorId: {in: manyId as string[]}},
                         })
 
                         return manyId.map((id: string) => result.filter(post => post.authorId === id));
                     });
-                    dataloaders.set(info.fieldNodes, newDataLoader);
+                    dataloaders.set(info.fieldNodes, dl);
                 }
-                return newDataLoader.load(source.id);
+                return dl.load(source.id);
             }
         },
 
